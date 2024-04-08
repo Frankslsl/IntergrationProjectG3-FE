@@ -6,7 +6,7 @@ import { SelectedPage } from "@/components/enum/selectedPage";
 import ActionButton from "@/components/ActionButton";
 import useMediaQuery from "@/hooks/useMediaQuery";
 import { motion } from "framer-motion";
-
+import { useNavigate } from 'react-router-dom';
 type Props = {
   selectedPage: SelectedPage;
   setSelectedPage: (value: SelectedPage) => void;
@@ -18,7 +18,16 @@ const Navbar = ({ selectedPage, setSelectedPage, isTopOfPage }: Props) => {
   const isAboveMediumScreens = useMediaQuery("(min-width:1060px)");
 
   const [isMenuToggled, setIsMenuToggled] = useState<boolean>(false);
-
+  //add useAuth and use Navigat
+  const navigate = useNavigate();
+//handle signin 
+const handleSignIn = async () => {
+  navigate('/signin'); 
+};
+const handleNavigateToRegister= ()=>{
+  setSelectedPage(SelectedPage.Register);
+  navigate('/register');
+}
   return (
     <nav>
       <div
@@ -66,14 +75,15 @@ const Navbar = ({ selectedPage, setSelectedPage, isTopOfPage }: Props) => {
                     setSelectedPage={setSelectedPage}
                     setIsMenuToggled={setIsMenuToggled}
                   />
+
                 </div>
                 <div className={`${flexBetween} gap-6 pl-4`}>
-                  <p>Sign In</p>
+                  <p onClick ={handleSignIn} style = {{cursor:'pointer'}}>Sign In </p>
                   <ActionButton
                     children="Become a Member"
                     setSelectedPage={setSelectedPage}
-                    page={SelectedPage.contactUs}
-                    href="#contactUs"
+                    page={SelectedPage.Register}
+                    onClick={handleNavigateToRegister}
                   ></ActionButton>
                 </div>
               </div>
@@ -141,6 +151,13 @@ const Navbar = ({ selectedPage, setSelectedPage, isTopOfPage }: Props) => {
               selectedPage={selectedPage}
               setSelectedPage={setSelectedPage}
               setIsMenuToggled={setIsMenuToggled}
+            />
+            <Link
+              href="/signin"
+              page={SelectedPage.SignIn}
+              selectedPage={selectedPage}
+              setSelectedPage={setSelectedPage}
+              setIsMenuToggled={setIsMenuToggled} 
             />
           </div>
         </div>

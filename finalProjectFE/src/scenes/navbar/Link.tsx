@@ -1,5 +1,7 @@
-import AnchorLink from "react-anchor-link-smooth-scroll";
+
 import { SelectedPage } from "@/components/enum/selectedPage";
+import { useNavigate, useLocation } from 'react-router-dom';
+
 
 type Props = {
   page: SelectedPage;
@@ -9,6 +11,7 @@ type Props = {
   setIsMenuToggled: (value: boolean) => void;
 };
 
+
 function Link({
   page,
   href,
@@ -16,21 +19,35 @@ function Link({
   setSelectedPage,
   setIsMenuToggled,
 }: Props) {
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>): void => {
     event.preventDefault();
     setSelectedPage(page);
     setIsMenuToggled(false);
+    if(location.pathname !== '/home') {
+      navigate(`/home`);
+    } else {
+      // stimulate the anchor element
+      const anchorTarget = document.querySelector(href);
+      if(anchorTarget) {
+        anchorTarget.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
   };
+  
   return (
-    <AnchorLink
-      href={href}
+    <a
+      href={location.pathname !== '/' ? `/#${href}` : href}
       className={`transition duration-500 hover:text-primary-300 ${
-        selectedPage === page ? "text-primary-300" : ""
+        selectedPage === page ? 'text-primary-300' : ''
       }`}
       onClick={handleClick}
     >
       {page}
-    </AnchorLink>
+    </a>
   );
 }
 

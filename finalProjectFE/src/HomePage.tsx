@@ -8,12 +8,18 @@ import Benefits from "./scenes/benefits";
 import OurClasses from "./scenes/OurClasses";
 import ContactUs from "./scenes/ContactUs";
 import Footer from "./scenes/Footer";
+import { useNavigate } from 'react-router-dom';
 
 function HomePage() {
   const [selectedPage, setSelectedPage] = useState<SelectedPage>(
     SelectedPage.home,
   );
   const isTopOfPage = useTopPage();
+  const navigate = useNavigate(); 
+  const handleNavigateToRegister = () => {
+    setSelectedPage(SelectedPage.Register); 
+    navigate('/register'); 
+  };
   return (
     <div className="app bg-gray-20">
       <Navbar
@@ -25,6 +31,9 @@ function HomePage() {
       <Benefits setSelectedPage={setSelectedPage} />
       <OurClasses setSelectedPage={setSelectedPage} />
       <ContactUs setSelectedPage={setSelectedPage} />
+      <button className="register-button" onClick={handleNavigateToRegister}>
+        Become a Member
+      </button>
       <Footer />
     </div>
   );
