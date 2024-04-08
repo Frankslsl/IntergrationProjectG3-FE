@@ -120,7 +120,7 @@ const UserProfile = () => {
                 />
               </td>
             </tr>
-            {user.password && ( // 只有当密码字段不为空时才显示确认密码字段
+            {user.password && ( 
               <tr>
                 <td className="px-4 py-2">Confirm Password</td>
                 <td className="px-4 py-2">
