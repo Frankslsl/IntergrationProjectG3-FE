@@ -6,7 +6,7 @@ import { SelectedPage } from "@/components/enum/selectedPage";
 import ActionButton from "@/components/ActionButton";
 import useMediaQuery from "@/hooks/useMediaQuery";
 import { motion } from "framer-motion";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 type Props = {
   selectedPage: SelectedPage;
   setSelectedPage: (value: SelectedPage) => void;
@@ -20,14 +20,14 @@ const Navbar = ({ selectedPage, setSelectedPage, isTopOfPage }: Props) => {
   const [isMenuToggled, setIsMenuToggled] = useState<boolean>(false);
   //add useAuth and use Navigat
   const navigate = useNavigate();
-//handle signin 
-const handleSignIn = async () => {
-  navigate('/signin'); 
-};
-const handleNavigateToRegister= ()=>{
-  setSelectedPage(SelectedPage.Register);
-  navigate('/register');
-}
+  //handle signin
+  const handleSignIn = async () => {
+    navigate("/signin");
+  };
+  const handleNavigateToRegister = () => {
+    setSelectedPage(SelectedPage.Register);
+    navigate("/register");
+  };
   return (
     <nav>
       <div
@@ -75,16 +75,19 @@ const handleNavigateToRegister= ()=>{
                     setSelectedPage={setSelectedPage}
                     setIsMenuToggled={setIsMenuToggled}
                   />
-
                 </div>
                 <div className={`${flexBetween} gap-6 pl-4`}>
-                  <p onClick ={handleSignIn} style = {{cursor:'pointer'}}>Sign In </p>
-                  <ActionButton
-                    children="Become a Member"
-                    setSelectedPage={setSelectedPage}
-                    page={SelectedPage.Register}
-                    onClick={handleNavigateToRegister}
-                  ></ActionButton>
+                  <p onClick={handleSignIn} style={{ cursor: "pointer" }}>
+                    Sign In{" "}
+                  </p>
+                  <button
+                    className="bg-secondary-500 rounded-md px-10 py-2 hover:bg-primary-500 hover:text-white"
+                    onClick={() => {
+                      navigate("/register");
+                    }}
+                  >
+                    Become a Member
+                  </button>
                 </div>
               </div>
             ) : (
@@ -152,13 +155,20 @@ const handleNavigateToRegister= ()=>{
               setSelectedPage={setSelectedPage}
               setIsMenuToggled={setIsMenuToggled}
             />
-            <Link
-              href="/signin"
-              page={SelectedPage.SignIn}
-              selectedPage={selectedPage}
-              setSelectedPage={setSelectedPage}
-              setIsMenuToggled={setIsMenuToggled} 
-            />
+            <a
+              href={"/signin"}
+              className={`transition duration-500 hover:text-primary-300 
+              `}
+            >
+              Sign in
+            </a>
+            <a
+              href={"/register"}
+              className={`transition duration-500 hover:text-primary-300 
+              `}
+            >
+              Register
+            </a>
           </div>
         </div>
       )}
