@@ -37,6 +37,7 @@ const SignIn = () => {
         ...toastConfig,
         position: "top-center",
       });
+      navigate("/dashboard");
     } else {
       toast.error("Login failed, Invalid email or password", {
         ...toastConfig,
