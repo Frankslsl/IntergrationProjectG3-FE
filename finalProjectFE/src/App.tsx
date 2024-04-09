@@ -40,8 +40,8 @@ const App = () => {
             <Route path="/*" element={<Navigate to={"/home"} />} />
           </Routes>
         </Suspense>
-        {showNavbarAndFooter && <Footer />}
       </AuthProvider>
+      {showNavbarAndFooter && <Footer />}
     </>
   );
 };

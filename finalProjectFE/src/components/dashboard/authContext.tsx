@@ -54,6 +54,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       return true;
     } catch (error) {
+      console.error(error);
       throw error;
     }
     // Backend login inteaction
