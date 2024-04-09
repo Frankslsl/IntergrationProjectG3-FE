@@ -5,7 +5,6 @@ interface User {
   username: string;
   password: string; 
 }
-
 interface AuthContextType {
   user: User | null;
   login: (loginData: {email: string; username?: string; password: string}) => Promise<boolean>; 
