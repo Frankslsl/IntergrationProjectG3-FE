@@ -1,24 +1,41 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
 import { Route, Routes, Navigate } from "react-router-dom";
-import { AuthProvider } from '../src/components/dashboard/authContext';
-import SignIn from './scenes/SignIn'; 
-import Dashboard from './components/dashboard/Dashboard';
-import Register from './scenes/Register';
+import { AuthProvider } from "../src/components/dashboard/authContext";
+import SignIn from "./scenes/SignIn";
+import Dashboard from "./components/dashboard/Dashboard";
+import Register from "./scenes/Register";
+import Navbar from "./scenes/navbar";
+import Footer from "./scenes/Footer";
+import { SelectedPage } from "./components/enum/selectedPage";
+import useTopPage from "./hooks/useTopPage";
 const HomePage = lazy(() => import("@/HomePage"));
 
 const App = () => {
+  const [selectedPage, setSelectedPage] = useState<SelectedPage>(
+    SelectedPage.home,
+  );
+  const isTopOfPage = useTopPage();
   return (
     <>
       <AuthProvider>
+        <Navbar
+          selectedPage={selectedPage}
+          setSelectedPage={setSelectedPage}
+          isTopOfPage={isTopOfPage}
+        />
         <Suspense fallback={<div>Loading...</div>}>
           <Routes>
-            <Route path="/home" element={<HomePage />} />
+            <Route
+              path="/home"
+              element={<HomePage setSelectedPage={setSelectedPage} />}
+            />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/dashboard" element={<Dashboard />}></Route>
             <Route path="/register" element={<Register />} />
-            <Route path="/*" element={<Navigate to={"/home"} />} />          
+            <Route path="/*" element={<Navigate to={"/home"} />} />
           </Routes>
         </Suspense>
+        <Footer />
       </AuthProvider>
     </>
   );

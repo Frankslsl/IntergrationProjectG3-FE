@@ -22,10 +22,6 @@ const SignIn = () => {
   const auth = useAuth();
   const navigate = useNavigate();
 
-  const selectedPage = SelectedPage.SignIn;
-  const setSelectedPage = () => {};
-  const isTopOfPage = true;
-
   const handleSignIn = async () => {
     //preset
     const presetEmail = "12@gmail.com";
@@ -55,11 +51,6 @@ const SignIn = () => {
   };
   return (
     <div>
-      <Navbar
-        selectedPage={selectedPage}
-        setSelectedPage={setSelectedPage}
-        isTopOfPage={isTopOfPage}
-      />
       <div className="flex h-screen bg-gray-200">
         <div className="m-auto w-full max-w-md rounded bg-white p-8 shadow">
           <h1 className="text-xl font-bold text-center text-gray-700">
