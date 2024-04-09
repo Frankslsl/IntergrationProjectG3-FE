@@ -1,6 +1,6 @@
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useState,ReactElement } from "react";
 import { Route, Routes, Navigate, useLocation } from "react-router-dom";
-import { AuthProvider } from "../src/components/dashboard/authContext";
+import { AuthProvider,useAuth } from "../src/components/dashboard/authContext";
 import SignIn from "./scenes/SignIn";
 import Dashboard from "./components/dashboard/Dashboard";
 import Register from "./scenes/Register";
@@ -9,6 +9,12 @@ import Footer from "./scenes/Footer";
 import { SelectedPage } from "./components/enum/selectedPage";
 import useTopPage from "./hooks/useTopPage";
 const HomePage = lazy(() => import("@/HomePage"));
+
+const ProtectedRoute = ({children}:{children:ReactElement})=>{
+  const {isAuthenticated} =useAuth();
+  return isAuthenticated() ? children:<Navigate to ='/signin' />;
+
+};
 
 const App = () => {
   const [selectedPage, setSelectedPage] = useState<SelectedPage>(
@@ -35,8 +41,13 @@ const App = () => {
               element={<HomePage setSelectedPage={setSelectedPage} />}
             />
             <Route path="/signin" element={<SignIn />} />
-            <Route path="/dashboard" element={<Dashboard />}></Route>
             <Route path="/register" element={<Register />} />
+            <Route path="/dashboard" element = {
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }/>
+            
             <Route path="/*" element={<Navigate to={"/home"} />} />
           </Routes>
         </Suspense>
