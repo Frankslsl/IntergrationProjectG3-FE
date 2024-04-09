@@ -7,8 +7,8 @@ import {
 import { motion } from "framer-motion";
 import H from "@/components/h";
 import Benefit from "./Benefit";
-import ActionButton from "@/components/ActionButton";
 import BenefitsPageGraphic from "@/assets/BenefitsPageGraphic.png";
+import { useNavigate } from "react-router-dom";
 
 const benefits: Array<BenefitType> = [
   {
@@ -40,6 +40,7 @@ type Props = {
 };
 
 const Benefits = ({ setSelectedPage }: Props) => {
+  const navigate = useNavigate();
   return (
     <section id="benefits" className=" mx-auto min-h-full w-5/6 py-20">
       <motion.div
@@ -127,13 +128,14 @@ const Benefits = ({ setSelectedPage }: Props) => {
                     autem ex, incidunt quidem quos omnis sint obcaecati
                     inventore, accusantium temporibus delectus reiciendis sit.
                   </p>
-                  <ActionButton
-                    setSelectedPage={setSelectedPage}
-                    href="#contactUs"
-                    page={SelectedPage.contactUs}
+                  <button
+                    className="bg-secondary-500 rounded-md px-10 py-2 hover:bg-primary-500 hover:text-white"
+                    onClick={() => {
+                      navigate("/register");
+                    }}
                   >
-                    Join Now
-                  </ActionButton>
+                    Join Us
+                  </button>
                 </div>
               </div>
             </div>

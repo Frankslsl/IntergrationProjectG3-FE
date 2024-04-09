@@ -14,6 +14,7 @@ function HomePage() {
     SelectedPage.home,
   );
   const isTopOfPage = useTopPage();
+
   return (
     <div className="app bg-gray-20">
       <Navbar
@@ -25,6 +26,7 @@ function HomePage() {
       <Benefits setSelectedPage={setSelectedPage} />
       <OurClasses setSelectedPage={setSelectedPage} />
       <ContactUs setSelectedPage={setSelectedPage} />
+
       <Footer />
     </div>
   );

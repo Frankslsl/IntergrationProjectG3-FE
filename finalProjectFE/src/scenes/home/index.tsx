@@ -1,18 +1,19 @@
 import { SelectedPage } from "@/components/enum/selectedPage";
 import useMediaQuery from "@/hooks/useMediaQuery";
-import ActionButton from "@/components/ActionButton";
 import HomePageGraphic from "@/assets/HomePageGraphic.png";
 import TinyLogo1 from "@/assets/tinyLogo1.png";
 import TinyLogo2 from "@/assets/tinyLogo2.png";
 
 import AnchorLink from "react-anchor-link-smooth-scroll";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   setSelectedPage: (value: SelectedPage) => void;
 };
 
 const Home = ({ setSelectedPage }: Props) => {
+  const navigate = useNavigate();
   const isAboveMeiumScreens = useMediaQuery("(min-width:1060px)");
 
   return (
@@ -62,12 +63,14 @@ const Home = ({ setSelectedPage }: Props) => {
             }}
             className="flex gap-8 items-center mt-8"
           >
-            <ActionButton
-              setSelectedPage={setSelectedPage}
-              href="#contactUs"
-              page={SelectedPage.contactUs}
-              children="Join Us"
-            />
+            <button
+              className="bg-secondary-500 rounded-md px-10 py-2 hover:bg-primary-500 hover:text-white"
+              onClick={() => {
+                navigate("/register");
+              }}
+            >
+              Join Us
+            </button>
             <AnchorLink
               className="text-sm font-bold text-primary-500 underline hover:text-secondary-500"
               onClick={() => {

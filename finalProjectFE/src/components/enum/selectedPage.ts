@@ -3,6 +3,9 @@ export enum SelectedPage {
   benefits = "Benefits",
   ourClasses = "Our Classes",
   contactUs = "Contact Us",
+  SignIn = "Sign In",
+  Register ="Register",
+
 }
 
 export type BenefitType = {
