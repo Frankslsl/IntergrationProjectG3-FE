@@ -5,15 +5,24 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
-import Snackbar from "@mui/material/Snackbar";
-import Alert, { AlertColor } from "@mui/material/Alert";
-import { SelectedPage } from "../components/enum/selectedPage";
+import axios from "axios";
+import { toast } from "react-toastify";
 
-interface SnackbarState {
-  open: boolean;
-  message: string;
-  severity: AlertColor;
-}
+//tostify configuration
+const toastConfig = {
+  autoClose: 5000,
+  hideProgressBar: false,
+  closeOnClick: true,
+  pauseOnHover: true,
+  draggable: false,
+  progress: undefined,
+};
+
+// interface SnackbarState {
+//   open: boolean;
+//   message: string;
+//   severity: AlertColor;
+// }
 
 interface FormData {
   username: string;
@@ -48,11 +57,7 @@ const Register = () => {
     confirmPassword: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
-  const [snackbar, setSnackbar] = useState<SnackbarState>({
-    open: false,
-    message: "",
-    severity: "success",
-  });
+
   const navigate = useNavigate();
 
   const validate = () => {
@@ -93,46 +98,25 @@ const Register = () => {
     // Assumed backend registration endpoint
     const registerUrl = "http://localhost:8080/api/auth/register";
     try {
-      const response = await fetch(registerUrl, {
-        method: "POST",
+      const response = await axios.post(registerUrl, formData, {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
       });
-
-      //   const data = await response.json();
 
       console.log(response);
-      if (response.ok) {
-        setSnackbar({
-          open: true,
-          message: "Registration successful",
-          severity: "success",
-        });
-        setTimeout(() => navigate("/signin"), 2000); // Delayed redirect to show message
-      } else {
-        let errorMessage = "Registration failed";
-        if (data.errorCode === "EMAIL_ALREADY_REGISTERED") {
-          errorMessage = "Email has already been registered";
-        } else if (data.errorCode === "USERNAME_ALREADY_TAKEN") {
-          errorMessage = "Username is already takern";
-        } else if (data.errorCode === "PHONE_ALREADY_REGISTERED") {
-          errorMessage = "Phone is already registered";
-        }
-        setSnackbar({ open: true, message: errorMessage, severity: "error" });
-      }
-    } catch (error) {
-      setSnackbar({
-        open: true,
-        message: "An error occurred during registration",
-        severity: "error",
-      });
-    }
-  };
 
-  const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
+      localStorage.setItem("token", response.data.token);
+
+      toast.success("Registration successful", {
+        ...toastConfig,
+        position: "top-center",
+      });
+      //   localStorage.setItem("token", response.body);
+      navigate("/dashboard");
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -186,19 +170,6 @@ const Register = () => {
             </Button>
           </Box>
         </Box>
-        <Snackbar
-          open={snackbar.open}
-          autoHideDuration={6000}
-          onClose={handleCloseSnackbar}
-        >
-          <Alert
-            onClose={handleCloseSnackbar}
-            severity={snackbar.severity}
-            sx={{ width: "100%" }}
-          >
-            {snackbar.message}
-          </Alert>
-        </Snackbar>
       </Container>
     </div>
   );

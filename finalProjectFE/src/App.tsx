@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from "react";
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider } from "../src/components/dashboard/authContext";
 import SignIn from "./scenes/SignIn";
 import Dashboard from "./components/dashboard/Dashboard";
@@ -15,14 +15,19 @@ const App = () => {
     SelectedPage.home,
   );
   const isTopOfPage = useTopPage();
+
+  const location = useLocation();
+  const showNavbarAndFooter = location.pathname !== "/dashboard";
   return (
     <>
       <AuthProvider>
-        <Navbar
-          selectedPage={selectedPage}
-          setSelectedPage={setSelectedPage}
-          isTopOfPage={isTopOfPage}
-        />
+        {showNavbarAndFooter && (
+          <Navbar
+            selectedPage={selectedPage}
+            setSelectedPage={setSelectedPage}
+            isTopOfPage={isTopOfPage}
+          />
+        )}
         <Suspense fallback={<div>Loading...</div>}>
           <Routes>
             <Route
@@ -35,7 +40,7 @@ const App = () => {
             <Route path="/*" element={<Navigate to={"/home"} />} />
           </Routes>
         </Suspense>
-        <Footer />
+        {showNavbarAndFooter && <Footer />}
       </AuthProvider>
     </>
   );

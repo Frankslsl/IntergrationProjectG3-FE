@@ -1,13 +1,19 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from "react";
+import axios from "axios";
 
 interface User {
   email: string;
   username: string;
-  password: string; 
+  // userId: string;
+  // password: string;
 }
 interface AuthContextType {
   user: User | null;
-  login: (loginData: {email: string; username?: string; password: string}) => Promise<boolean>; 
+  login: (loginData: {
+    email: string;
+    username?: string;
+    password: string;
+  }) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: () => boolean;
 }
@@ -29,14 +35,33 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
 
-  const login = async (loginData: {email: string; password: string}) => {
+  const login = async (loginData: { email: string; password: string }) => {
+    const registerUrl = "http://localhost:8080/api/auth/login";
+    try {
+      const response = await axios.post(registerUrl, loginData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log("login" + response);
+      localStorage.setItem("token", response.data.token);
+      setUser({
+        email: loginData.email,
+        username: "testUser",
+        // password: loginData.password,
+      });
+
+      return true;
+    } catch (error) {
+      throw error;
+    }
     // Backend login inteaction
     // not real email
-    setUser({email: loginData.email, username: "testUser", password: loginData.password});
-    return true;
   };
 
   const logout = () => {
+    localStorage.removeItem("token");
     setUser(null);
   };
 

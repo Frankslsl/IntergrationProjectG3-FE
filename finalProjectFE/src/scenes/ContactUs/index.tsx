@@ -4,7 +4,6 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import { FieldErrors, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import ContactUsPageGraphic from "@/assets/ContactUsPageGraphic.png";
 type Props = {
   setSelectedPage: (value: SelectedPage) => void;
 };
