@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import axios, { AxiosInstance } from "axios";
-import { jwtDecode } from "jwt-decode";
+
 import { useNavigate } from "react-router-dom";
 
 interface User {
