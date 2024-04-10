@@ -1,44 +1,24 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '../dashboard/authContext';
-import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useAuth } from "../dashboard/authContext";
+
+const toastConfig = {
+  autoClose: 5000,
+  hideProgressBar: false,
+  closeOnClick: true,
+  pauseOnHover: true,
+  draggable: false,
+  progress: undefined,
+};
 
 const Navbar = () => {
-  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const { logout } = useAuth();
-  const [firstName, setFirstName] = useState('');
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchFirstName = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        toast.error('Please login.');
-        navigate('/signin');
-        return;
-      }
-
-      try {
-        const response = await axios.get('/api/user/', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setFirstName(response.data.firstName); // Assuming the first name is stored in 'firstName' field
-      } catch (error) {
-        toast.error('Error fetching first name');
-      }
-    };
-
-    fetchFirstName();
-  }, [navigate]);
+  const [isProfileMenuOpen, setIsprofileMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
 
   const toggleProfileMenu = () => {
-    setIsProfileMenuOpen(prevState => !prevState); 
-  };
-
-  const handleLogout = () => {
-    logout();
-    navigate('/signin');
+    setIsprofileMenuOpen(!isProfileMenuOpen);
   };
 
   return (
@@ -49,7 +29,7 @@ const Navbar = () => {
           onClick={toggleProfileMenu}
           className="flex items-center focus:outline-none focus:shadow-outline"
         >
-          firstName
+          {user?.username}
           <svg
             className="fill-current h-4 w-4 ml-2"
             xmlns="http://www.w3.org/2000/svg"
@@ -60,19 +40,34 @@ const Navbar = () => {
         </button>
         {isProfileMenuOpen && (
           <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl z-20 text-black">
-            <button
-              onClick={() => navigate('/profile')}
+            <a
+              href="/user-profile"
               className="block px-4 py-2 text-sm hover:bg-gray-200"
             >
               Profile
-            </button>
-            <button className="block px-4 py-2 text-sm hover:bg-gray-200">Settings</button>
-            <button
-              onClick={handleLogout}
+            </a>
+            <a href="#" className="block px-4 py-2 text-sm hover:bg-gray-200">
+              Settings
+            </a>
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                try {
+                  logout();
+                  toast.success("Logout successfully", {
+                    ...toastConfig,
+                    position: "top-center",
+                  });
+                  navigate("/home");
+                } catch (error) {
+                  console.error(error);
+                }
+              }}
               className="block px-4 py-2 text-sm hover:bg-gray-200"
             >
               Logout
-            </button>
+            </a>
           </div>
         )}
       </div>
