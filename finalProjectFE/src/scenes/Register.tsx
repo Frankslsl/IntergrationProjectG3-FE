@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
+import { useAuth } from "@/components/dashboard/authContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -47,6 +48,9 @@ interface FormErrors {
 }
 
 const Register = () => {
+  //get the axios api with baseURL
+  const { getAxios } = useAuth();
+  const api = getAxios(null);
   const [formData, setFormData] = useState<FormData>({
     username: "",
     firstName: "",
@@ -98,7 +102,7 @@ const Register = () => {
     // Assumed backend registration endpoint
     const registerUrl = "http://localhost:8080/api/auth/register";
     try {
-      const response = await axios.post(registerUrl, formData, {
+      const response = await api.post("/api/auth/register", formData, {
         headers: {
           "Content-Type": "application/json",
         },

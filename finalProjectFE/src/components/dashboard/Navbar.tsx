@@ -1,11 +1,23 @@
-import {useState} from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { useAuth } from "../dashboard/authContext";
 
-const Navbar = ()=>{
-  const [isProfileMenuOpen, setIsprofileMenuOpen]=useState(false);
-  const {user, logout}=useAuth();
+const toastConfig = {
+  autoClose: 5000,
+  hideProgressBar: false,
+  closeOnClick: true,
+  pauseOnHover: true,
+  draggable: false,
+  progress: undefined,
+};
 
-  const toggleProfileMenu = ()=>{
+const Navbar = () => {
+  const navigate = useNavigate();
+  const [isProfileMenuOpen, setIsprofileMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
+
+  const toggleProfileMenu = () => {
     setIsprofileMenuOpen(!isProfileMenuOpen);
   };
 
@@ -17,7 +29,7 @@ const Navbar = ()=>{
           onClick={toggleProfileMenu}
           className="flex items-center focus:outline-none focus:shadow-outline"
         >
-          {user ? user.username : "Guest"}
+          {user?.username}
           <svg
             className="fill-current h-4 w-4 ml-2"
             xmlns="http://www.w3.org/2000/svg"
@@ -41,7 +53,16 @@ const Navbar = ()=>{
               href="#"
               onClick={(e) => {
                 e.preventDefault();
-                logout();
+                try {
+                  logout();
+                  toast.success("Logout successfully", {
+                    ...toastConfig,
+                    position: "top-center",
+                  });
+                  navigate("/home");
+                } catch (error) {
+                  console.error(error);
+                }
               }}
               className="block px-4 py-2 text-sm hover:bg-gray-200"
             >
