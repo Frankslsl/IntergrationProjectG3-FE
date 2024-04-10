@@ -4,19 +4,14 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-interface UserProfile {
-  username: string;
-  // Add other properties as needed
-}
-
 const Navbar = () => {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const { logout } = useAuth();
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [firstName, setFirstName] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    const fetchFirstName = async () => {
       const token = localStorage.getItem('token');
       if (!token) {
         toast.error('Please login.');
@@ -25,20 +20,20 @@ const Navbar = () => {
       }
 
       try {
-        const response = await axios.get<UserProfile>('/api/user/profile', {
+        const response = await axios.get('/api/user/', {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setUserProfile(response.data);
+        setFirstName(response.data.firstName); // Assuming the first name is stored in 'firstName' field
       } catch (error) {
-        toast.error('Error fetching user profile');
+        toast.error('Error fetching first name');
       }
     };
 
-    fetchUserProfile();
+    fetchFirstName();
   }, [navigate]);
 
   const toggleProfileMenu = () => {
-    setIsProfileMenuOpen(prevState => !prevState); // Toggle the state
+    setIsProfileMenuOpen(prevState => !prevState); 
   };
 
   const handleLogout = () => {
@@ -46,9 +41,6 @@ const Navbar = () => {
     navigate('/signin');
   };
 
-  const handleProfileClick = () => {
-    navigate('/profile');
-  };
   return (
     <nav className="bg-gray-800 text-white px-6 py-4 flex justify-between items-center">
       <span className="text-xl font-bold">Programming Academy</span>
@@ -57,7 +49,7 @@ const Navbar = () => {
           onClick={toggleProfileMenu}
           className="flex items-center focus:outline-none focus:shadow-outline"
         >
-          Profile
+          firstName
           <svg
             className="fill-current h-4 w-4 ml-2"
             xmlns="http://www.w3.org/2000/svg"
@@ -69,7 +61,7 @@ const Navbar = () => {
         {isProfileMenuOpen && (
           <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl z-20 text-black">
             <button
-              onClick={handleProfileClick}
+              onClick={() => navigate('/profile')}
               className="block px-4 py-2 text-sm hover:bg-gray-200"
             >
               Profile
@@ -84,9 +76,7 @@ const Navbar = () => {
           </div>
         )}
       </div>
-      
     </nav>
-    
   );
 };
 
