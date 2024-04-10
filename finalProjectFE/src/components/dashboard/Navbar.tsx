@@ -1,14 +1,54 @@
-import {useState} from "react";
-import { useAuth } from "../dashboard/authContext";
+import { useState, useEffect } from 'react';
+import { useAuth } from '../dashboard/authContext';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-const Navbar = ()=>{
-  const [isProfileMenuOpen, setIsprofileMenuOpen]=useState(false);
-  const {user, logout}=useAuth();
+interface UserProfile {
+  username: string;
+  // Add other properties as needed
+}
 
-  const toggleProfileMenu = ()=>{
-    setIsprofileMenuOpen(!isProfileMenuOpen);
+const Navbar = () => {
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const { logout } = useAuth();
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('Please login.');
+        navigate('/signin');
+        return;
+      }
+
+      try {
+        const response = await axios.get<UserProfile>('/api/user/profile', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUserProfile(response.data);
+      } catch (error) {
+        toast.error('Error fetching user profile');
+      }
+    };
+
+    fetchUserProfile();
+  }, [navigate]);
+
+  const toggleProfileMenu = () => {
+    setIsProfileMenuOpen(prevState => !prevState); // Toggle the state
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/signin');
+  };
+
+  const handleProfileClick = () => {
+    navigate('/profile');
+  };
   return (
     <nav className="bg-gray-800 text-white px-6 py-4 flex justify-between items-center">
       <span className="text-xl font-bold">Programming Academy</span>
@@ -17,7 +57,7 @@ const Navbar = ()=>{
           onClick={toggleProfileMenu}
           className="flex items-center focus:outline-none focus:shadow-outline"
         >
-          {user ? user.username : "Guest"}
+          Profile
           <svg
             className="fill-current h-4 w-4 ml-2"
             xmlns="http://www.w3.org/2000/svg"
@@ -28,29 +68,25 @@ const Navbar = ()=>{
         </button>
         {isProfileMenuOpen && (
           <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl z-20 text-black">
-            <a
-              href="/user-profile"
+            <button
+              onClick={handleProfileClick}
               className="block px-4 py-2 text-sm hover:bg-gray-200"
             >
               Profile
-            </a>
-            <a href="#" className="block px-4 py-2 text-sm hover:bg-gray-200">
-              Settings
-            </a>
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                logout();
-              }}
+            </button>
+            <button className="block px-4 py-2 text-sm hover:bg-gray-200">Settings</button>
+            <button
+              onClick={handleLogout}
               className="block px-4 py-2 text-sm hover:bg-gray-200"
             >
               Logout
-            </a>
+            </button>
           </div>
         )}
       </div>
+      
     </nav>
+    
   );
 };
 

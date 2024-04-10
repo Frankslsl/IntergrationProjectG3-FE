@@ -1,5 +1,5 @@
 import React from 'react';
-import NavbarWrapper from './Navbar'; 
+import Navbar from './Navbar'; 
 import { AuthProvider } from './authContext'; 
 import SideMenu from '../dashboard/menulist/SideMenu';
 interface DashboardProps {
@@ -11,7 +11,7 @@ const Dashboard: React.FC<DashboardProps> = ({ children }) => {
         <AuthProvider>
         <div className="dashboard-layout">
             
-            <NavbarWrapper />
+            <Navbar/>
             <br/>
             <SideMenu />
             <div className="dashboard-content">
