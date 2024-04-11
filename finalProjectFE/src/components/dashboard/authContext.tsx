@@ -10,7 +10,7 @@ interface User {
   firstName: string;
   lastName: string;
   phoneNumber: string;
-  role: string[];
+  role: String[];
 }
 
 type DecodedType = {
@@ -36,7 +36,6 @@ interface AuthProviderProps {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -53,7 +52,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const api = getAxios(null);
 
     try {
-
       const response = await api.post("/api/auth/login", loginData, {
         headers: {
           "Content-Type": "application/json",
@@ -62,7 +60,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       console.log(response);
       localStorage.setItem("token", response.data.token);
-      await fetchUserInfo(response.data.token);
+      fetchUserInfo(response.data.token);
 
       return true;
     } catch (error) {
@@ -84,7 +82,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const userId = decode.userId;
       const api = getAxios(token);
       try {
-
         const response = (
           await api.get(`/api/user/fetchUser`, { withCredentials: true })
         ).data;
@@ -115,7 +112,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const decoded = jwtDecode(token);
       const currentTime = Date.now() / 1000;
       if (decoded.exp) {
-        return decoded.exp > currentTime;
+        if (decoded.exp > currentTime) {
+          return true;
+        } else {
+          return false;
+        }
       }
       return true;
     } catch (error) {
@@ -127,7 +128,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const getAxios = (token: string | null): AxiosInstance => {
     const api = axios.create({ baseURL: "http://localhost:8080" });
     if (checkAuthenticated(token)) {
-      api.interceptors.request.use((config) => {
+      const newApi = api.interceptors.request.use((config) => {
         config.headers["Authorization"] = `Bearer ${token}`;
         return config;
       });
@@ -156,4 +157,4 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 };
 
-// export default AuthProvider;
+export default AuthProvider;
