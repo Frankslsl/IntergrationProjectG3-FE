@@ -12,22 +12,22 @@ interface Course {
 }
 
 const mockCourses: Course[] = [
-  { id: 1, name: "Intro to Java", image: 'https://via.placeholder.com/150', description: 'Learn the basics of java..' },
+  { id: 1, name: "Intro to Java", image: 'https://via.placeholder.com/150', description: 'Learn the basics of Java.' },
   { id: 2, name: "Intro to React", image: 'https://via.placeholder.com/150', description: 'Learn the basics of React, including components, state, and props.' },
-  { id: 3, name: "Intro to Python", image: 'https://via.placeholder.com/150', description: 'Learn the basics of Python' },
+  { id: 3, name: "Intro to Python", image: 'https://via.placeholder.com/150', description: 'Learn the basics of Python.' },
 ];
 
 const RegistrationList = () => {
-    const { user, logout } = useAuth();
+    const { user, getAxios, logout } = useAuth();
     const navigate = useNavigate();
     const [courses, setCourses] = useState<Course[]>(mockCourses);
     const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
 
     useEffect(() => {
         const token = localStorage.getItem('token');
-        setCourses(mockCourses);
+        setCourses(mockCourses); // Optionally, fetch courses from backend
         console.log(courses);
-        if (!token) {
+        if (!token || !user) {
             navigate('/signin');
             return;
         }
@@ -36,22 +36,25 @@ const RegistrationList = () => {
         if (savedCourseId) {
             setSelectedCourseId(parseInt(savedCourseId, 10));
         }
-    }, [navigate, logout]);
+    }, [navigate, logout, courses, user]);
 
     const handleRegister = async (courseId: number) => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            toast.error('No token found, please login.');
+        if (!user) {
+            toast.error('User not found, please login.');
             navigate('/signin');
             return;
         }
 
+        const api = getAxios(localStorage.getItem('token')); // Utilize getAxios for authentication
         const registrationEndpoint = '/api/course/register';
+
         try {
-            const response = await axios.post(
+            const response = await api.post(
                 registrationEndpoint,
-                { courseId },
-                { headers: { Authorization: `Bearer ${token}` } }
+                {
+                    courseId: courseId,
+                    userId: user.userId // Include userId in the payload
+                }
             );
 
             if (response.status === 200) {
@@ -68,12 +71,12 @@ const RegistrationList = () => {
                     logout();
                     navigate('/signin');
                 } else if (error.response) {
-                    toast.error('Registration error: ' + error.response.data);
+                    toast.error('Registration error: ' + error.response.data.message);
                 } else {
-                    toast.error('Unexpected error: ' + error);
+                    toast.error('Unexpected error: ' + error.message);
                 }
             } else {
-                toast.error('Unexpected error: ' + error);
+                toast.error('Unexpected error: ' + error.message);
             }
         }
     };
@@ -83,20 +86,20 @@ const RegistrationList = () => {
             <h2 className="text-xl font-bold mb-4">Courses List</h2>
             <div className="flex flex-col gap-8">
                 {courses.map((course) => (
-                <div key={course.id} className="mb-4 flex items-start">
-                    <img src={course.image} alt={course.name} className="w-32 h-32 mr-4" />
-
-                    <div className="flex flex-col justify-between">
-                    <h3 className="text-lg font-bold mb-2">{course.name}</h3>
-                    <p className="mb-4">{course.description}</p>
-                    <button
-                        onClick={() => handleRegister(course.id)}
-                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50"style={{ width: '150px', height: '40px' }}
-                    >
-                        Register
-                    </button>
+                    <div key={course.id} className="mb-4 flex items-start">
+                        <img src={course.image} alt={course.name} className="w-32 h-32 mr-4" />
+                        <div className="flex flex-col justify-between">
+                            <h3 className="text-lg font-bold mb-2">{course.name}</h3>
+                            <p className="mb-4">{course.description}</p>
+                            <button
+                                onClick={() => handleRegister(course.id)}
+                                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50"
+                                style={{ width: '150px', height: '40px' }}
+                            >
+                                Register
+                            </button>
+                        </div>
                     </div>
-                </div>
                 ))}
             </div>
         </div>

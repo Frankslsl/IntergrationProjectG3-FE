@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import axios, { AxiosInstance } from "axios";
-
+import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 
 interface User {
@@ -10,7 +10,7 @@ interface User {
   firstName: string;
   lastName: string;
   phoneNumber: string;
-  role: String[];
+  role: string[];
 }
 
 type DecodedType = {
@@ -36,6 +36,7 @@ interface AuthProviderProps {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -52,6 +53,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const api = getAxios(null);
 
     try {
+
       const response = await api.post("/api/auth/login", loginData, {
         headers: {
           "Content-Type": "application/json",
@@ -60,7 +62,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       console.log(response);
       localStorage.setItem("token", response.data.token);
-      fetchUserInfo(response.data.token);
+      await fetchUserInfo(response.data.token);
 
       return true;
     } catch (error) {
@@ -82,6 +84,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const userId = decode.userId;
       const api = getAxios(token);
       try {
+
         const response = (
           await api.get(`/api/user/fetchUser`, { withCredentials: true })
         ).data;
@@ -112,11 +115,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const decoded = jwtDecode(token);
       const currentTime = Date.now() / 1000;
       if (decoded.exp) {
-        if (decoded.exp > currentTime) {
-          return true;
-        } else {
-          return false;
-        }
+        return decoded.exp > currentTime;
       }
       return true;
     } catch (error) {
@@ -128,7 +127,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const getAxios = (token: string | null): AxiosInstance => {
     const api = axios.create({ baseURL: "http://localhost:8080" });
     if (checkAuthenticated(token)) {
-      const newApi = api.interceptors.request.use((config) => {
+      api.interceptors.request.use((config) => {
         config.headers["Authorization"] = `Bearer ${token}`;
         return config;
       });
@@ -157,4 +156,4 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 };
 
-export default AuthProvider;
+// export default AuthProvider;

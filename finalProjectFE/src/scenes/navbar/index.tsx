@@ -32,10 +32,7 @@ const Navbar = ({ selectedPage, setSelectedPage, isTopOfPage }: Props) => {
       navigate("/signin");
     }
   };
-  const handleNavigateToRegister = () => {
-    setSelectedPage(SelectedPage.Register);
-    navigate("/register");
-  };
+
   return (
     <nav>
       <div

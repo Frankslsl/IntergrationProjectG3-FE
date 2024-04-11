@@ -1,3 +1,5 @@
+// noinspection Annotator
+
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TextField from "@mui/material/TextField";
@@ -6,10 +8,9 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import { useAuth } from "@/components/dashboard/authContext";
-import axios from "axios";
 import { toast } from "react-toastify";
 
-//tostify configuration
+//toastify configuration
 const toastConfig = {
   autoClose: 5000,
   hideProgressBar: false,
@@ -18,12 +19,6 @@ const toastConfig = {
   draggable: false,
   progress: undefined,
 };
-
-// interface SnackbarState {
-//   open: boolean;
-//   message: string;
-//   severity: AlertColor;
-// }
 
 interface FormData {
   username: string;
@@ -65,7 +60,7 @@ const Register = () => {
   const navigate = useNavigate();
 
   const validate = () => {
-    let tempErrors: FormErrors = {};
+    const tempErrors: FormErrors = {};
     tempErrors.username = formData.username ? "" : "Username is required.";
     tempErrors.firstName = formData.firstName ? "" : "First name is required.";
     tempErrors.lastName = formData.lastName ? "" : "Last name is required.";
@@ -100,7 +95,6 @@ const Register = () => {
     if (!validate()) return;
 
     // Assumed backend registration endpoint
-    const registerUrl = "http://localhost:8080/api/auth/register";
     try {
       const response = await api.post("/api/auth/register", formData, {
         headers: {
