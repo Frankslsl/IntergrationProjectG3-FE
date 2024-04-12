@@ -4,21 +4,13 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import { FieldErrors, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import toastConfig from "@/components/toastConfig/toastConfig";
 type Props = {
   setSelectedPage: (value: SelectedPage) => void;
 };
 
 const inputStyle =
   "mb-5 w-full rounded-lg bg-primary-300 px-5 py-3 placeholder-white";
-
-const toastConfig = {
-  autoClose: 5000,
-  hideProgressBar: false,
-  closeOnClick: true,
-  pauseOnHover: true,
-  draggable: false,
-  progress: undefined,
-};
 
 type FormData = {
   name: string;
@@ -72,7 +64,8 @@ const ContactUs = ({ setSelectedPage }: Props) => {
           transition={{ duration: 0.5 }}
         >
           <H>
-            <span className="text-primary-500">JOIN NOW</span> TO GET IN SHAPE
+            <span className="text-primary-500">CONTACT US</span> to start
+            programming
           </H>
           <p className="my-5">
             Lorem ipsum dolor sit amet consectetur, adipisicing elit. Unde

@@ -1,16 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import toastConfig from "../toastConfig/toastConfig";
 import { useAuth } from "../dashboard/authContext";
-
-const toastConfig = {
-  autoClose: 5000,
-  hideProgressBar: false,
-  closeOnClick: true,
-  pauseOnHover: true,
-  draggable: false,
-  progress: undefined,
-};
 
 const Navbar = () => {
   const navigate = useNavigate();

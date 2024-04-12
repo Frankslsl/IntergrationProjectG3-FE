@@ -2,19 +2,11 @@ import { SelectedPage } from "@/components/enum/selectedPage";
 import H from "@/components/h";
 import fetchCourseTypeQuery from "./fetchCourseTypeQuery";
 import { toast } from "react-toastify";
+import toastConfig from "@/components/toastConfig/toastConfig";
 
 import { motion } from "framer-motion";
 import Class from "./Class";
 import { useQuery } from "@tanstack/react-query";
-
-const toastConfig = {
-  autoClose: 5000,
-  hideProgressBar: false,
-  closeOnClick: true,
-  pauseOnHover: true,
-  draggable: false,
-  progress: undefined,
-};
 
 type CourseType = {
   name: string;

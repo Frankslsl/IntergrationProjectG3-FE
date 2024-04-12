@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../authContext";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
+import toastConfig from "@/components/toastConfig/toastConfig";
 import axios from "axios";
 
 interface CourseScheduleProps {
@@ -15,7 +16,7 @@ interface Course {
   id: number;
   name: string;
   startDate: string;
-  times: string[]; 
+  times: string[];
 }
 
 const CourseSchedule: React.FC<CourseScheduleProps> = ({ course }) => {
@@ -23,16 +24,19 @@ const CourseSchedule: React.FC<CourseScheduleProps> = ({ course }) => {
   const { getAxios } = useAuth();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCourseSchedule = async () => {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        toast.error('Please log in to view the course schedule.');
-        navigate('/signin');
+        toast.error("Please log in to view the course schedule.", {
+          ...toastConfig,
+          position: "top-center",
+        });
+        navigate("/signin");
         return;
       }
 
@@ -40,20 +44,23 @@ const CourseSchedule: React.FC<CourseScheduleProps> = ({ course }) => {
       try {
         const response = await api.get(`/api/course-schedule/${course.id}`);
         if (response.data && response.data.length > 0) {
-          setCourses(response.data); 
+          setCourses(response.data);
         } else {
-          throw new Error('No data available');
+          throw new Error("No data available");
         }
       } catch (error) {
-        console.error('Fetching course schedule failed or no data:', error);
-        toast.error('No course schedule found, using mock data.');
+        console.error("Fetching course schedule failed or no data:", error);
+        toast.error("No course schedule found, using mock data.", {
+          ...toastConfig,
+          position: "top-right",
+        });
         setCourses([
           {
             id: course.id,
             name: course.name,
             startDate: "2024-01-01",
-            times: ["09:00 - 10:30", "11:00 - 12:30", "13:00 - 14:30"] 
-          }
+            times: ["09:00 - 10:30", "11:00 - 12:30", "13:00 - 14:30"],
+          },
         ]);
       } finally {
         setLoading(false);
@@ -70,47 +77,67 @@ const CourseSchedule: React.FC<CourseScheduleProps> = ({ course }) => {
   };
 
   const handleRegister = async (courseId: number) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      toast.error('Please log in to register for the course.');
-      navigate('/signin');
+      toast.error("Please log in to register for the course.", {
+        ...toastConfig,
+        position: "top-right",
+      });
+      navigate("/signin");
       return;
     }
 
     const api = getAxios(token);
 
     try {
-      const response = await api.post(
-        '/api/course/register',
-        { courseId }
-      );
+      const response = await api.post("/api/course/register", { courseId });
 
       if (response.status === 200) {
         setSelectedTime(null); // Reset selected time after registration
-        toast.success('Course successfully registered');
+        toast.success("Course successfully registered", {
+          ...toastConfig,
+          position: "top-right",
+        });
       } else {
-        toast.error('Registration failed: ' + response.data.message);
+        toast.error("Registration failed: " + response.data.message, {
+          ...toastConfig,
+          position: "top-right",
+        });
       }
     } catch (error: any) {
-      console.error('Registration error:', error);
+      console.error("Registration error:", error);
       if (axios.isAxiosError(error)) {
         if (error.response && error.response.status === 401) {
-          toast.error('Token expired, please log in again.');
-          navigate('/signin');
+          toast.error("Token expired, please log in again.", {
+            ...toastConfig,
+            position: "top-right",
+          });
+          navigate("/signin");
         } else if (error.response) {
-          toast.error('Registration error: ' + error.response.data);
+          toast.error("Registration error: " + error.response.data, {
+            ...toastConfig,
+            position: "top-right",
+          });
         } else {
-          toast.error('Unexpected error: ' + error);
+          toast.error("Unexpected error: " + error, {
+            ...toastConfig,
+            position: "top-right",
+          });
         }
       } else {
-        toast.error('Unexpected error: ' + error);
+        toast.error("Unexpected error: " + error, {
+          ...toastConfig,
+          position: "top-right",
+        });
       }
     }
   };
 
   return (
     <div className="container mx-auto px-4">
-      <h2 className="text-2xl font-semibold text-gray-800 my-5">Course Schedule</h2>
+      <h2 className="text-2xl font-semibold text-gray-800 my-5">
+        Course Schedule
+      </h2>
       {loading ? (
         <p>Loading...</p>
       ) : error ? (
@@ -118,12 +145,15 @@ const CourseSchedule: React.FC<CourseScheduleProps> = ({ course }) => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {courses.map((course) => (
-            <div key={course.id} className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer">
+            <div
+              key={course.id}
+              className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer"
+            >
               <h3 className="text-xl font-bold">{course.name}</h3>
               <p className="text-gray-600">Start Date: {course.startDate}</p>
               <div className="relative">
                 <select
-                  value={selectedTime || ''}
+                  value={selectedTime || ""}
                   onChange={handleSelectTime}
                   className="w-full bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded inline-flex items-center"
                 >
@@ -134,7 +164,7 @@ const CourseSchedule: React.FC<CourseScheduleProps> = ({ course }) => {
                     </option>
                   ))}
                 </select>
-                <button 
+                <button
                   className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
                   onClick={() => handleRegister(course.id)}
                 >
@@ -150,6 +180,3 @@ const CourseSchedule: React.FC<CourseScheduleProps> = ({ course }) => {
 };
 
 export default CourseSchedule;
-
-
-     
