@@ -162,14 +162,14 @@ const Navbar = ({ selectedPage, setSelectedPage, isTopOfPage }: Props) => {
               setIsMenuToggled={setIsMenuToggled}
             />
             <a
-              href={"/signin"}
+              href="/signin"
               className={`transition duration-500 hover:text-primary-300 
               `}
             >
               Sign in
             </a>
             <a
-              href={"/register"}
+              href="/register"
               className={`transition duration-500 hover:text-primary-300 
               `}
             >
