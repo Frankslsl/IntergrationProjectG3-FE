@@ -1,6 +1,11 @@
+
 import React from "react";
-import NavbarWrapper from "./Navbar";
+import Navbar from "./Navbar";
 import SideMenu from "../dashboard/menulist/SideMenu";
+
+
+
+
 interface DashboardProps {
   children?: React.ReactNode;
 }
@@ -8,10 +13,12 @@ interface DashboardProps {
 const Dashboard: React.FC<DashboardProps> = ({ children }) => {
   return (
     <div className="dashboard-layout">
-      <NavbarWrapper />
+      <Navbar />
       <br />
       <SideMenu />
       <div className="dashboard-content">{children}</div>
+      
+      
     </div>
   );
 };

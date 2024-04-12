@@ -10,7 +10,7 @@ interface User {
   firstName: string;
   lastName: string;
   phoneNumber: string;
-  role: String[];
+  role: string[];
 }
 
 type DecodedType = {
