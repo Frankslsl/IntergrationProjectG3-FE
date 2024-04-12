@@ -1,25 +1,39 @@
 import { SelectedPage } from "@/components/enum/selectedPage";
 import H from "@/components/h";
-import { ClassesType } from "@/components/enum/selectedPage";
-import image1 from "@/assets/BenefitsPageGraphic.png";
+import fetchCourseTypeQuery from "./fetchCourseTypeQuery";
+import { toast } from "react-toastify";
 
 import { motion } from "framer-motion";
 import Class from "./Class";
+import { useQuery } from "@tanstack/react-query";
+
+const toastConfig = {
+  autoClose: 5000,
+  hideProgressBar: false,
+  closeOnClick: true,
+  pauseOnHover: true,
+  draggable: false,
+  progress: undefined,
+};
+
+type CourseType = {
+  name: string;
+  description: string;
+  image: string;
+};
 
 type Props = {
   setSelectedPage: (value: SelectedPage) => void;
 };
 
-const classes: Array<ClassesType> = [
-  {
-    name: "JAVA",
-    description:
-      "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Sint officiis voluptas repudiandae consequuntur, dolore nulla, blanditiis fugit recusandae non reiciendis vel delectus cum dolor omnis beatae, quaerat in sed ad",
-    image: image1,
-  },
-];
-
 const OurClasses = ({ setSelectedPage }: Props) => {
+  const { data, error, isError, isLoading } = useQuery<CourseType[]>({
+    queryKey: ["courseTypes"],
+    queryFn: fetchCourseTypeQuery,
+  });
+  if (isError) {
+    toast.error(error.message, { ...toastConfig, position: "top-center" });
+  }
   return (
     <div className="w-full bg-primary-100 py-10" id="ourClasses">
       <motion.div
@@ -51,12 +65,13 @@ const OurClasses = ({ setSelectedPage }: Props) => {
         </motion.div>
         <div className="mt-10 h-[353px] w-full overflow-x-auto overflow-y-hidden">
           <ul className="w-[2800px] whitespace-nowrap">
-            {classes.map((item, index) => (
+            {data?.map((item, index) => (
               <Class
                 key={`${item.name}-${index}`}
                 name={item.name}
                 description={item.description}
                 image={item.image}
+                isLoading={isLoading}
               />
             ))}
           </ul>
