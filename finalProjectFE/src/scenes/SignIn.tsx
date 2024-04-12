@@ -1,10 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../components/dashboard/authContext";
-import Navbar from "@/scenes/navbar";
-import { SelectedPage } from "../components/enum/selectedPage";
 import { toast } from "react-toastify";
-// import Alert from 'react-bootstrap/Alert';
+import { AxiosError } from "axios";
+import { useNavigate } from "react-router-dom";
 
 // the configuration about the toast
 const toastConfig = {
@@ -17,49 +15,30 @@ const toastConfig = {
 };
 
 const SignIn = () => {
-  const [email, setEmail] = useState("123@gmail.com");
-  const [password, setPassword] = useState("123456");
-  const auth = useAuth();
   const navigate = useNavigate();
-
-  const selectedPage = SelectedPage.SignIn;
-  const setSelectedPage = () => {};
-  const isTopOfPage = true;
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { login } = useAuth();
 
   const handleSignIn = async () => {
-    //preset
-    const presetEmail = "12@gmail.com";
-    const presetPassword = "1234";
-
-    if (email === presetEmail && password === presetPassword) {
-      //toast out the success message
+    try {
+      await login({ email, password });
       toast.success("Login successfully", {
         ...toastConfig,
         position: "top-center",
       });
       navigate("/dashboard");
-    } else {
-      toast.error("Login failed, Invalid email or password", {
-        ...toastConfig,
-        position: "top-center",
-      });
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message, {
+          ...toastConfig,
+          position: "top-center",
+        });
+      }
     }
-
-    //back end
-    // const result = await auth.login({ email, password });
-    // if (result) {
-    //   navigate('/dashboard');
-    // } else {
-    //   console.log('Login failed: Invalid email or password.');
-    // }
   };
   return (
     <div>
-      <Navbar
-        selectedPage={selectedPage}
-        setSelectedPage={setSelectedPage}
-        isTopOfPage={isTopOfPage}
-      />
       <div className="flex h-screen bg-gray-200">
         <div className="m-auto w-full max-w-md rounded bg-white p-8 shadow">
           <h1 className="text-xl font-bold text-center text-gray-700">

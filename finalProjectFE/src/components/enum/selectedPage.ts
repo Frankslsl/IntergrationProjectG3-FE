@@ -4,8 +4,8 @@ export enum SelectedPage {
   ourClasses = "Our Classes",
   contactUs = "Contact Us",
   SignIn = "Sign In",
-  Register ="Register",
-
+  Register = "Register",
+  null = "",
 }
 
 export type BenefitType = {

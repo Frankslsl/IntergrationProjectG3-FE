@@ -1,165 +1,176 @@
-import { ChangeEvent, FormEvent, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import Box from '@mui/material/Box';
-import Snackbar from '@mui/material/Snackbar';
-import Alert, { AlertColor } from '@mui/material/Alert';
-import Navbar from "@/scenes/navbar";
-import { SelectedPage } from "../components/enum/selectedPage"; 
+// noinspection Annotator
 
+import { ChangeEvent, FormEvent, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
+import Box from "@mui/material/Box";
+import { useAuth } from "@/components/dashboard/authContext";
+import { toast } from "react-toastify";
 
-interface SnackbarState {
-    open: boolean;
-    message: string;
-    severity: AlertColor; 
-}
+//toastify configuration
+const toastConfig = {
+  autoClose: 5000,
+  hideProgressBar: false,
+  closeOnClick: true,
+  pauseOnHover: true,
+  draggable: false,
+  progress: undefined,
+};
 
 interface FormData {
-    username: string;
-    firstName: string;
-    lastName: string;
-    phoneNumber: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-    [key: string]: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  [key: string]: string;
 }
 
 interface FormErrors {
-    username?: string;
-    firstName?: string;
-    lastName?: string;
-    phoneNumber?: string;
-    email?: string;
-    password?: string;
-    confirmPassword?: string;
-    [key: string]: string | undefined;
+  username?: string;
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+  [key: string]: string | undefined;
 }
-const selectedPage = SelectedPage.Register;
-const setSelectedPage = () => {}; 
-const isTopOfPage = true; 
+
 const Register = () => {
-    const [formData, setFormData] = useState<FormData>({
-        username: '',
-        firstName: '',
-        lastName: '',
-        phoneNumber: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-});
-    const [errors, setErrors] = useState<FormErrors>({});
-    const [snackbar, setSnackbar] = useState<SnackbarState>({ open: false, message: '', severity: 'success' });
-    const navigate = useNavigate();
+  //get the axios api with baseURL
+  const { getAxios } = useAuth();
+  const api = getAxios(null);
+  const [formData, setFormData] = useState<FormData>({
+    username: "",
+    firstName: "",
+    lastName: "",
+    phoneNumber: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [errors, setErrors] = useState<FormErrors>({});
 
-    const validate = () => {
-        let tempErrors: FormErrors = {};
-        tempErrors.username = formData.username ? '' : 'Username is required.';
-        tempErrors.firstName = formData.firstName ? '' : 'First name is required.';
-        tempErrors.lastName = formData.lastName ? '' : 'Last name is required.';
-        tempErrors.phoneNumber = formData.phoneNumber ? '' : 'Phone number is required.';
-        tempErrors.email = /\S+@\S+\.\S+/.test(formData.email) ? '' : 'Email is not valid.';
-        tempErrors.password = formData.password.length > 5 ? '' : 'Password must be at least 6 characters long.';
-        tempErrors.confirmPassword = formData.password === formData.confirmPassword ? '' : 'Passwords do not match.';
-        setErrors(tempErrors);
-        return Object.values(tempErrors).every(x => x === "");
-    };
+  const navigate = useNavigate();
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData({
-        ...formData,
-        [name]: value,
-        });
-    };
+  const validate = () => {
+    const tempErrors: FormErrors = {};
+    tempErrors.username = formData.username ? "" : "Username is required.";
+    tempErrors.firstName = formData.firstName ? "" : "First name is required.";
+    tempErrors.lastName = formData.lastName ? "" : "Last name is required.";
+    tempErrors.phoneNumber = formData.phoneNumber
+      ? ""
+      : "Phone number is required.";
+    tempErrors.email = /\S+@\S+\.\S+/.test(formData.email)
+      ? ""
+      : "Email is not valid.";
+    tempErrors.password =
+      formData.password.length > 5
+        ? ""
+        : "Password must be at least 6 characters long.";
+    tempErrors.confirmPassword =
+      formData.password === formData.confirmPassword
+        ? ""
+        : "Passwords do not match.";
+    setErrors(tempErrors);
+    return Object.values(tempErrors).every((x) => x === "");
+  };
 
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        if (!validate()) return;
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
 
-        // Assumed backend registration endpoint
-        const registerUrl = '/api/register';
-        try {
-        const response = await fetch(registerUrl, {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData),
-        });
-        const data = await response.json();
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!validate()) return;
 
-        if (response.ok) {
-            setSnackbar({ open: true, message: 'Registration successful', severity: 'success' });
-            setTimeout(() => navigate('/signin'), 2000); // Delayed redirect to show message
-        } else {
-            let errorMessage = 'Registration failed';
-            if(data.errorCode === 'EMAIL_ALREADY_REGISTERED'){
-                errorMessage ='Email has already been registered';
-            }else if(data.errorCode=== 'USERNAME_ALREADY_TAKEN'){
-                errorMessage ='Username is already takern';
-            } else if (data.errorCode==='PHONE_ALREADY_REGISTERED'){
-                errorMessage ='Phone is already registered';
-            }
-            setSnackbar({open: true, message: errorMessage,severity: 'error'});
-        }
-        } catch (error) {
-        setSnackbar({ open: true, message: 'An error occurred during registration', severity: 'error' });
-        }
-    };
+    // Assumed backend registration endpoint
+    try {
+      const response = await api.post("/api/auth/register", formData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-    const handleCloseSnackbar = () => {
-        setSnackbar({ ...snackbar, open: false });
-    };
+      console.log(response);
 
-    return (
-        <div>
-            <Navbar 
-                selectedPage={selectedPage}
-                setSelectedPage={setSelectedPage}
-                isTopOfPage={isTopOfPage}
-            />
-            <br/>
-            <br/>
-            <br/>
-            <Container maxWidth="sm">
-            <Box sx={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <Typography component="h1" variant="h5">Sign up</Typography>
-                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-                {/* Complete form with all fields */}
-                {Object.keys(formData).map((key) => (
-                    <TextField
-                    key={key}
-                    margin="normal"
-                    required
-                    fullWidth
-                    id={key}
-                    label={key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1')} // Convert camelCase to space-separated words and capitalize first letter
-                    name={key}
-                    autoComplete={key}
-                    value={formData[key]}
-                    onChange={handleChange}
-                    error={!!errors[key]}
-                    helperText={errors[key]}
-                    type={key.includes('password') ? 'password' : 'text'}
-                    />
-                ))}
-                <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
-                    Sign Up
-                </Button>
-                </Box>
-            </Box>
-            <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-                <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
-                {snackbar.message}
-                </Alert>
-            </Snackbar>
-            </Container>
-        </div>
-    );
+      localStorage.setItem("token", response.data.token);
+
+      toast.success("Registration successful", {
+        ...toastConfig,
+        position: "top-center",
+      });
+      //   localStorage.setItem("token", response.body);
+      navigate("/dashboard");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <div>
+      <Container maxWidth="sm" className="py-10">
+        <Box
+          sx={{
+            marginTop: 8,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Typography component="h1" variant="h5">
+            Sign up
+          </Typography>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{ mt: 1 }}
+          >
+            {/* Complete form with all fields */}
+            {Object.keys(formData).map((key) => (
+              <TextField
+                key={key}
+                margin="normal"
+                required
+                fullWidth
+                id={key}
+                label={
+                  key.charAt(0).toUpperCase() +
+                  key.slice(1).replace(/([A-Z])/g, " $1")
+                } // Convert camelCase to space-separated words and capitalize first letter
+                name={key}
+                autoComplete={key}
+                value={formData[key]}
+                onChange={handleChange}
+                error={!!errors[key]}
+                helperText={errors[key]}
+                type={key.includes("password") ? "password" : "text"}
+              />
+            ))}
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Sign Up
+            </Button>
+          </Box>
+        </Box>
+      </Container>
+    </div>
+  );
 };
 
 export default Register;

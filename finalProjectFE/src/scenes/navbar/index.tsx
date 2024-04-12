@@ -3,10 +3,10 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/solid";
 import Logo from "@/assets/Logo.png";
 import Link from "./Link";
 import { SelectedPage } from "@/components/enum/selectedPage";
-import ActionButton from "@/components/ActionButton";
 import useMediaQuery from "@/hooks/useMediaQuery";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/components/dashboard/authContext";
 type Props = {
   selectedPage: SelectedPage;
   setSelectedPage: (value: SelectedPage) => void;
@@ -14,6 +14,7 @@ type Props = {
 };
 
 const Navbar = ({ selectedPage, setSelectedPage, isTopOfPage }: Props) => {
+  const { checkAuthenticated, fetchUserInfo } = useAuth();
   const flexBetween = "flex items-center justify-between";
   const isAboveMediumScreens = useMediaQuery("(min-width:1060px)");
 
@@ -22,12 +23,16 @@ const Navbar = ({ selectedPage, setSelectedPage, isTopOfPage }: Props) => {
   const navigate = useNavigate();
   //handle signin
   const handleSignIn = async () => {
-    navigate("/signin");
+    //if the token is still validated, navigate to dashboard directly
+    const token = localStorage.getItem("token");
+    if (checkAuthenticated(token)) {
+      fetchUserInfo(token), navigate("/dashboard", { replace: true });
+    } else {
+      //if there is no available token, jump to sign-in page
+      navigate("/signin");
+    }
   };
-  const handleNavigateToRegister = () => {
-    setSelectedPage(SelectedPage.Register);
-    navigate("/register");
-  };
+
   return (
     <nav>
       <div
@@ -83,6 +88,7 @@ const Navbar = ({ selectedPage, setSelectedPage, isTopOfPage }: Props) => {
                   <button
                     className="bg-secondary-500 rounded-md px-10 py-2 hover:bg-primary-500 hover:text-white"
                     onClick={() => {
+                      localStorage.removeItem("token");
                       navigate("/register");
                     }}
                   >
@@ -156,14 +162,14 @@ const Navbar = ({ selectedPage, setSelectedPage, isTopOfPage }: Props) => {
               setIsMenuToggled={setIsMenuToggled}
             />
             <a
-              href={"/signin"}
+              href="/signin"
               className={`transition duration-500 hover:text-primary-300 
               `}
             >
               Sign in
             </a>
             <a
-              href={"/register"}
+              href="/register"
               className={`transition duration-500 hover:text-primary-300 
               `}
             >
