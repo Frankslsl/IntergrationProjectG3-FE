@@ -10,6 +10,7 @@ const UserProfile = () => {
   const [userData, setUserData] = useState({
     firstName: "",
     lastName: "",
+    username:"",
     email: "",
     phoneNumber: "",
     password: "",
@@ -127,6 +128,16 @@ const UserProfile = () => {
             value={userData.email}
             readOnly
             className="bg-gray-100 cursor-not-allowed"
+          />
+        </div>
+        <div className="flex flex-col">
+          <label className="font-medium">Username:</label>
+          <input
+            type="text"
+            name="userName"
+            value={userData.username}
+            onChange={handleChange}
+            className="mt-1 p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
           />
         </div>
         {/* Editable fields */}
