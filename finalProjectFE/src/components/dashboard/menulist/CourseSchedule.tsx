@@ -42,7 +42,7 @@ const CourseSchedule: React.FC<CourseScheduleProps> = ({ courseTypeId, courseTyp
           throw new Error("No courses found.");
         }
       } catch (error) {
-        toast.error("Failed to fetch courses.", toastConfig);
+        toast.error("No course is Selected.", toastConfig);
       }
     };
 
@@ -96,7 +96,7 @@ const CourseSchedule: React.FC<CourseScheduleProps> = ({ courseTypeId, courseTyp
             Register
           </button>
         </div>
-      ) : <p>No courses available.</p>}
+      ) : <p>Please select The Course you are interested.</p>}
     </div>
   );
 };
