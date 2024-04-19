@@ -32,6 +32,7 @@ const UserProfile = () => {
               ...response.data,
               password: "",
               confirmPassword: "",
+              
             });
           } else {
             throw new Error("Failed to fetch user data.");
@@ -81,6 +82,7 @@ const UserProfile = () => {
     const payload = {
       phoneNumber: userData.phoneNumber,
       ...(userData.password && { password: userData.password }),
+      username: userData.username,
     };
     api
       .put(`/api/user/editUser/${authUser?.userId}`, payload)
@@ -134,7 +136,7 @@ const UserProfile = () => {
           <label className="font-medium">Username:</label>
           <input
             type="text"
-            name="userName"
+            name="username"
             value={userData.username}
             onChange={handleChange}
             className="mt-1 p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
