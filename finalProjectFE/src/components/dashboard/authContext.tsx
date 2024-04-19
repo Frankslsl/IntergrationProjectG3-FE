@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 import axios, { AxiosInstance } from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
@@ -47,6 +53,10 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    fetchUserInfo(token);
+  }, [localStorage.getItem("token")]);
 
   const login = async (loginData: { email: string; password: string }) => {
     const api = getAxios(null);

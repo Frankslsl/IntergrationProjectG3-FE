@@ -10,7 +10,11 @@ const UserProfile = () => {
   const [userData, setUserData] = useState({
     firstName: "",
     lastName: "",
+<<<<<<< HEAD
     username:"",
+=======
+    username: "",
+>>>>>>> 2e44873558eed962b51f8903cd45c37597e60eeb
     email: "",
     phoneNumber: "",
     password: "",
@@ -32,7 +36,10 @@ const UserProfile = () => {
               ...response.data,
               password: "",
               confirmPassword: "",
+<<<<<<< HEAD
               
+=======
+>>>>>>> 2e44873558eed962b51f8903cd45c37597e60eeb
             });
           } else {
             throw new Error("Failed to fetch user data.");
@@ -82,7 +89,10 @@ const UserProfile = () => {
     const payload = {
       phoneNumber: userData.phoneNumber,
       ...(userData.password && { password: userData.password }),
+<<<<<<< HEAD
       username: userData.username,
+=======
+>>>>>>> 2e44873558eed962b51f8903cd45c37597e60eeb
     };
     api
       .put(`/api/user/editUser/${authUser?.userId}`, payload)
@@ -136,7 +146,11 @@ const UserProfile = () => {
           <label className="font-medium">Username:</label>
           <input
             type="text"
+<<<<<<< HEAD
             name="username"
+=======
+            name="userName"
+>>>>>>> 2e44873558eed962b51f8903cd45c37597e60eeb
             value={userData.username}
             onChange={handleChange}
             className="mt-1 p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
