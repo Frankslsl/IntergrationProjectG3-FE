@@ -13,12 +13,13 @@ const SideMenu = () => {
         setActiveTab(tabId);
     };
 
+
     const renderActiveTab = () => {
         switch (activeTab) {
             case 'register-courses':
                 return <RegistrationList onRegister={handleRegister} />;
             case 'course-schedule':
-                return currentCourse ? <CourseSchedule courseTypeId={currentCourse.id} courseTypeName={currentCourse.name} /> : <div>No course selected</div>;
+                return currentCourse ? <CourseSchedule courseTypeId={currentCourse.id} courseTypeName={currentCourse.name} onRegister = {handleRegister} /> : <div>No course selected</div>;
             case 'my-courses':
                 return <RegisteredCourses />;
             case 'user-profile':
