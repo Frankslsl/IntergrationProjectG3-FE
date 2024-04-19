@@ -21,7 +21,7 @@ const SideMenu = () => {
             case 'course-schedule':
                 return currentCourse ? <CourseSchedule courseTypeId={currentCourse.id} courseTypeName={currentCourse.name} onRegister = {handleRegister} /> : <div>No course selected</div>;
             case 'my-courses':
-                return <RegisteredCourses />;
+                return <RegisteredCourses onRegister={()=> setActiveTab('Register-courses')}/>;
             case 'user-profile':
                 return <UserProfile />;
             default:

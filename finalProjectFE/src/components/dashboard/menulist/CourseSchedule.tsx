@@ -9,7 +9,7 @@ import toastConfig from "@/components/toastConfig/toastConfig";
 interface CourseScheduleProps {
   courseTypeId: number;
   courseTypeName: string;
-  onRegister: (tabId: string, courseId: number, courseName: string) => void; // Adding this to handle tab switching
+  onRegister: (tabId: string, courseId: number, courseName: string) => void;
 }
 
 interface Course {
@@ -66,7 +66,7 @@ const CourseSchedule: React.FC<CourseScheduleProps> = ({ courseTypeId, courseTyp
       const response = await api.post(`/api/user/addCourseToUser/${user.userId}/${selectedCourse.id}`);
       if (response.status === 200) {
         toast.success("Course successfully added to your profile.", toastConfig);
-        onRegister("my-courses", selectedCourse.id, selectedCourse.name); // Correctly passing the necessary parameters for tab switching
+        onRegister("my-courses", selectedCourse.id, selectedCourse.name); 
       } else {
         toast.error("Registration failed: " + response.data.message, toastConfig);
       }
