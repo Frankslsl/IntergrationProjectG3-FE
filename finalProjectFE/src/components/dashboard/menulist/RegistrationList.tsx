@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState,useEffect } from "react";
 import { useAuth } from "../authContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -46,6 +46,11 @@ const RegistrationList = ({ onRegister }: RegistrationListProps) => {
   const { user, isAuthenticated } = useAuth();
 
   const navigate = useNavigate();
+
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
+
+
   useEffect(() => {
     if (!isAuthenticated) {
       toast.warn("Login expired, please login again", {
@@ -55,6 +60,14 @@ const RegistrationList = ({ onRegister }: RegistrationListProps) => {
       navigate("/signin");
     }
   });
+  useEffect(() => {
+    if (data) {
+      const filtered = data.filter(course =>
+        course.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredCourses(filtered);
+    }
+  }, [data, searchTerm]);
 
   //   const [courses, setCourses] = useState<Course[]>(mockCourses);
   //   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
@@ -113,19 +126,24 @@ const RegistrationList = ({ onRegister }: RegistrationListProps) => {
     //     }
     //}
   };
-
   return (
     <div>
       <h2 className="text-xl font-bold mb-4">Courses List</h2>
       <div className="flex flex-col gap-8">
-        {data?.map((course) => (
+        <input
+          type="text"
+          placeholder="Search courses..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="border border-gray-300 rounded-md px-4 py-2 mb-4"
+        />
+        {filteredCourses.map((course) => (
           <div key={course.id} className="mb-4 flex items-start">
             <img
               src={`data:image/jpeg;base64,${course.image}`}
               alt={course.name}
               className="w-32 h-32 mr-4"
             />
-
             <div className="flex flex-col justify-between">
               <h3 className="text-lg font-bold mb-2">{course.name}</h3>
               <p className="mb-4">{course.description}</p>

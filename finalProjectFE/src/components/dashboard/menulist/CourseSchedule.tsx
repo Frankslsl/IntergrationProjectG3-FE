@@ -1,134 +1,92 @@
+// CourseSchedule.tsx
+
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../authContext";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import toastConfig from "@/components/toastConfig/toastConfig";
-import axios from "axios";
+import { AxiosError } from "axios";
 
 interface CourseScheduleProps {
-  course: {
-    id: number;
-    name: string;
-  };
+  courseTypeId: number;
+  courseTypeName: string;
+  onRegister: (tabId: string, courseId: number, courseName: string) => void;
 }
 
 interface Course {
   id: number;
   name: string;
   startDate: string;
-  times: string[];
+  duration: string;
 }
 
-const CourseSchedule: React.FC<CourseScheduleProps> = ({ course }) => {
+const CourseSchedule: React.FC<CourseScheduleProps> = ({
+  courseTypeId,
+  courseTypeName,
+  onRegister,
+}) => {
   const navigate = useNavigate();
-  const { getAxios } = useAuth();
+  const { getAxios, user } = useAuth();
   const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
 
   useEffect(() => {
-    const fetchCourseSchedule = async () => {
-      setLoading(true);
+    const fetchCoursesByTypeId = async () => {
       const token = localStorage.getItem("token");
       if (!token) {
-        toast.error("Please log in to view the course schedule.", {
-          ...toastConfig,
-          position: "top-center",
-        });
+        toast.error("Please log in.", toastConfig);
         navigate("/signin");
         return;
       }
-
       const api = getAxios(token);
       try {
-        const response = await api.get(`/api/course-schedule/${course.id}`);
-        if (response.data && response.data.length > 0) {
+        const response = await api.get(
+          `/api/course/safe/allCoursesByTypeId/${courseTypeId}`,
+        );
+        if (response.data) {
           setCourses(response.data);
         } else {
-          throw new Error("No data available");
+          throw new Error("No courses found.");
         }
       } catch (error) {
-        console.error("Fetching course schedule failed or no data:", error);
-        toast.error("No course schedule found, using mock data.", {
-          ...toastConfig,
-          position: "top-right",
-        });
-        setCourses([
-          {
-            id: course.id,
-            name: course.name,
-            startDate: "2024-01-01",
-            times: ["09:00 - 10:30", "11:00 - 12:30", "13:00 - 14:30"],
-          },
-        ]);
-      } finally {
-        setLoading(false);
+        toast.error("No course is Selected.", toastConfig);
       }
     };
 
-    if (course) {
-      fetchCourseSchedule();
+    fetchCoursesByTypeId();
+  }, [courseTypeId, navigate, getAxios]);
+
+  const handleRegister = async () => {
+    if (!selectedCourse) {
+      toast.error("Please select a course first.", toastConfig);
+      return;
     }
-  }, [course, getAxios, navigate]);
-
-  const handleSelectTime = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedTime(e.target.value);
-  };
-
-  const handleRegister = async (courseId: number) => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      toast.error("Please log in to register for the course.", {
-        ...toastConfig,
-        position: "top-right",
-      });
+    if (!token || !user) {
+      toast.error("Session expired, please log in again.", toastConfig);
       navigate("/signin");
       return;
     }
 
-    const api = getAxios(token);
-
     try {
-      const response = await api.post("/api/course/register", { courseId });
+      const api = getAxios(token);
 
-      if (response.status === 200) {
-        setSelectedTime(null); // Reset selected time after registration
-        toast.success("Course successfully registered", {
-          ...toastConfig,
-          position: "top-right",
-        });
+      const response = await api.post(
+        `/api/user/addCourseToUser/${user.userId}/${selectedCourse.id}`,
+      );
+      // if (response.status === 200) {
+      toast.success("Course successfully added to your profile.", toastConfig);
+      onRegister("my-courses", selectedCourse.id, selectedCourse.name);
+      // } else {
+      //   toast.error("Registration failed: " + response.data.message, toastConfig);
+      // }
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        console.log(error);
+        toast.error(error.response?.data.message, toastConfig);
       } else {
-        toast.error("Registration failed: " + response.data.message, {
-          ...toastConfig,
-          position: "top-right",
-        });
-      }
-    } catch (error: any) {
-      console.error("Registration error:", error);
-      if (axios.isAxiosError(error)) {
-        if (error.response && error.response.status === 401) {
-          toast.error("Token expired, please log in again.", {
-            ...toastConfig,
-            position: "top-right",
-          });
-          navigate("/signin");
-        } else if (error.response) {
-          toast.error("Registration error: " + error.response.data, {
-            ...toastConfig,
-            position: "top-right",
-          });
-        } else {
-          toast.error("Unexpected error: " + error, {
-            ...toastConfig,
-            position: "top-right",
-          });
-        }
-      } else {
-        toast.error("Unexpected error: " + error, {
-          ...toastConfig,
-          position: "top-right",
-        });
+        console.log(error);
+        toast.error("Unexpected error during registration: " + error);
       }
     }
   };
@@ -136,44 +94,32 @@ const CourseSchedule: React.FC<CourseScheduleProps> = ({ course }) => {
   return (
     <div className="container mx-auto px-4">
       <h2 className="text-2xl font-semibold text-gray-800 my-5">
-        Course Schedule
+        {courseTypeName}
       </h2>
-      {loading ? (
-        <p>Loading...</p>
-      ) : error ? (
-        <p>{error}</p>
-      ) : (
+      {courses.length ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {courses.map((course) => (
             <div
               key={course.id}
-              className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer"
+              className={`border rounded-lg p-4 shadow-sm ${selectedCourse?.id === course.id ? "bg-blue-100 border-blue-500" : "hover:shadow-md"}`}
+              onClick={() => setSelectedCourse(course)}
             >
               <h3 className="text-xl font-bold">{course.name}</h3>
-              <p className="text-gray-600">Start Date: {course.startDate}</p>
-              <div className="relative">
-                <select
-                  value={selectedTime || ""}
-                  onChange={handleSelectTime}
-                  className="w-full bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded inline-flex items-center"
-                >
-                  <option value="">Select Time</option>
-                  {course.times.map((timeOption) => (
-                    <option key={timeOption} value={timeOption}>
-                      {timeOption}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
-                  onClick={() => handleRegister(course.id)}
-                >
-                  Register
-                </button>
-              </div>
+              <p>Start Date: {course.startDate}</p>
+              <p>Duration: {course.duration}</p>
             </div>
           ))}
+          <br />
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
+            onClick={handleRegister}
+            disabled={!selectedCourse}
+          >
+            Register
+          </button>
         </div>
+      ) : (
+        <p>Please select The Course you are interested.</p>
       )}
     </div>
   );

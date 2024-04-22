@@ -33,15 +33,6 @@ const Navbar = () => {
         {isProfileMenuOpen && (
           <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl z-20 text-black">
             <a
-              href="/user-profile"
-              className="block px-4 py-2 text-sm hover:bg-gray-200"
-            >
-              Profile
-            </a>
-            <a href="#" className="block px-4 py-2 text-sm hover:bg-gray-200">
-              Settings
-            </a>
-            <a
               href="#"
               onClick={(e) => {
                 e.preventDefault();
