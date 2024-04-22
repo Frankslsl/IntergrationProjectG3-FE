@@ -3,6 +3,7 @@ import { useAuth } from "../authContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import toastConfig from "@/components/toastConfig/toastConfig";
+import { AxiosError } from "axios";
 
 const UserProfile = () => {
   const { isAuthenticated, getAxios, user: authUser } = useAuth();
@@ -10,7 +11,7 @@ const UserProfile = () => {
   const [userData, setUserData] = useState({
     firstName: "",
     lastName: "",
-    username:"",
+    username: "",
     email: "",
     phoneNumber: "",
     password: "",
@@ -32,7 +33,6 @@ const UserProfile = () => {
               ...response.data,
               password: "",
               confirmPassword: "",
-              
             });
           } else {
             throw new Error("Failed to fetch user data.");
@@ -40,8 +40,8 @@ const UserProfile = () => {
         })
         .catch((error) => {
           const errMsg =
-            error instanceof Error
-              ? error.message
+            error instanceof AxiosError
+              ? error.response?.data.message
               : "An unknown error occurred";
           toast.error(`Error fetching user data: ${errMsg}`, toastConfig);
         });
@@ -82,7 +82,6 @@ const UserProfile = () => {
     const payload = {
       phoneNumber: userData.phoneNumber,
       ...(userData.password && { password: userData.password }),
-      username: userData.username,
     };
     api
       .put(`/api/user/editUser/${authUser?.userId}`, payload)
@@ -95,7 +94,9 @@ const UserProfile = () => {
       })
       .catch((error) => {
         const errMsg =
-          error instanceof Error ? error.message : "An unknown error occurred";
+          error instanceof AxiosError
+            ? error.response?.data.message
+            : "An unknown error occurred";
         toast.error(`Failed to update profile: ${errMsg}`, toastConfig);
       });
   };
@@ -136,7 +137,7 @@ const UserProfile = () => {
           <label className="font-medium">Username:</label>
           <input
             type="text"
-            name="username"
+            name="userName"
             value={userData.username}
             onChange={handleChange}
             className="mt-1 p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
