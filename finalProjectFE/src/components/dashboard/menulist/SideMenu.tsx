@@ -2,7 +2,7 @@ import { useState } from 'react';
 import CourseSchedule from '../menulist/CourseSchedule';
 import RegistrationList from '../menulist/RegistrationList';
 import RegisteredCourses from '../menulist/RegisteredCourses';
-import UserProfile from './UserProfile'; // Adjust the path as necessary
+import UserProfile from './UserProfile'; 
 
 const SideMenu = () => {
     const [activeTab, setActiveTab] = useState<string>('register-courses');
